@@ -9,8 +9,8 @@ class Video extends StatefulWidget {
 }
 
 class _VideoState extends State<Video> {
-  final videoPlayerController = VideoPlayerController.network(
-    'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
+  final videoPlayerController = VideoPlayerController.asset(
+    'assets/videos/butterfly.mp4',
   );
 
   @override

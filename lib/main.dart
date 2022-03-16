@@ -171,8 +171,7 @@ class _MyAppState extends State<MyApp> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Stripes(
-                          child: Image.network(
-                              'https://images.unsplash.com/photo-1515569067071-ec3b51335dd0?fit=crop&w=500&q=80'),
+                          child: Image.asset('assets/images/car.jpeg'),
                           curve: Curves.easeInOutQuart,
                           delay: const Duration(seconds: 1),
                           duration: const Duration(seconds: 3),
