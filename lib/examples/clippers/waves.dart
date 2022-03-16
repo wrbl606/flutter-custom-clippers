@@ -201,6 +201,19 @@ class WavesClipper extends CustomClipper<Path> {
         Point<double>(startPoint.x + progressValue + xMovement.dx, 0);
     final endPoint = Point<double>(startPoint.x + size.width, size.height * .3);
     path.lineTo(startPoint.x, startPoint.y);
+
+    /// Quadratic bezier curve makes use of three points:
+    /// start, control, and end.
+    /// start and end are obvious,
+    /// control one indicates a point through which the
+    /// line should go.
+    /// Given the three points quadratic bezier curve
+    /// will produce a smooth path that meets all of
+    /// given points.
+    ///
+    /// We're providing only control and end points here
+    /// since the start one in the point in which the path
+    /// is currently at.
     path.quadraticBezierTo(
       controlPoint.x,
       controlPoint.y,

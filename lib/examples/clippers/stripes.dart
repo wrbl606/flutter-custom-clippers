@@ -50,7 +50,9 @@ class StripesClipper extends CustomClipper<Path> {
 
   @override
   bool shouldReclip(StripesClipper oldClipper) =>
-      oldClipper.progress != progress;
+      oldClipper.progress != progress ||
+      oldClipper.stripes != stripes ||
+      oldClipper.skewFactor != skewFactor;
 }
 
 class Stripes extends StatefulWidget {
@@ -90,17 +92,18 @@ class _StripesState extends State<Stripes> with SingleTickerProviderStateMixin {
     animation = CurvedAnimation(
       parent: tween.animate(controller),
       curve: widget.curve,
-    )..addListener(() {
-        setState(() {});
-      });
+    )..addListener(_updateState);
 
     Future.delayed(widget.delay).then((_) {
       controller.forward();
     });
   }
 
+  void _updateState() => setState(() {});
+
   @override
   void dispose() {
+    animation.removeListener(_updateState);
     controller.dispose();
     super.dispose();
   }
