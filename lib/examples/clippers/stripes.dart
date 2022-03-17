@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+/// Calculates the path for given size and tells
+/// the instance user whether or not a reclip should be done.
 class StripesClipper extends CustomClipper<Path> {
   final double progress;
   final int stripes;
@@ -55,6 +57,8 @@ class StripesClipper extends CustomClipper<Path> {
       oldClipper.skewFactor != skewFactor;
 }
 
+/// Helper widget that drives the animation
+/// for the stripes.
 class Stripes extends StatefulWidget {
   final Color color;
   final Curve curve;

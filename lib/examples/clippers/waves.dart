@@ -1,11 +1,10 @@
 import 'dart:math';
 
-import 'package:custom_clipper/utils/path_shadow_clipper.dart';
 import 'package:flutter/material.dart';
 
 /// Another convenience widget that allows
 /// for layer stacking.
-class WavesPage extends StatefulWidget {
+class WavesPage extends StatelessWidget {
   final int layers;
   final int peaks;
   final Color mainColor;
@@ -28,27 +27,23 @@ class WavesPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<WavesPage> createState() => _WavesPageState();
-}
-
-class _WavesPageState extends State<WavesPage>
-    with SingleTickerProviderStateMixin {
-  @override
   Widget build(BuildContext context) => Stack(
-        children: List.generate(widget.layers, (index) => index)
+        /// Draw layers from the back to the front,
+        /// applying a bit of height and opacity accordingly
+        /// to layer number.
+        children: List.generate(layers, (index) => index)
             .map<Widget>(
               (index) => Positioned(
-                bottom: index * (widget.effectHeight / widget.layers),
+                bottom: index * (effectHeight / layers),
                 left: 0,
                 right: 0,
                 child: Waves(
-                  peaks: widget.peaks,
-                  curve: widget.curve,
-                  maxExtent: widget.maxPeakExtent,
-                  color:
-                      widget.mainColor.withOpacity(1 - index / widget.layers),
-                  delay: widget.layerDelay * index,
-                  duration: widget.duration,
+                  peaks: peaks,
+                  curve: curve,
+                  maxExtent: maxPeakExtent,
+                  color: mainColor.withOpacity(1 - index / layers),
+                  delay: layerDelay * index,
+                  duration: duration,
                 ),
               ),
             )
@@ -103,9 +98,14 @@ class _WavesState extends State<Waves> with SingleTickerProviderStateMixin {
       parent: tween.animate(controller),
       curve: widget.curve,
     )
-      ..addListener(_updateState)
+
+      /// On each animation state change
+      /// update the widget to reflect
+      /// current state.
+      ..addListener(_triggerRerender)
+
+      /// Loop the animation.
       ..addStatusListener((status) {
-        /// Loop the animation.
         switch (status) {
           case AnimationStatus.completed:
             controller.reverse();
@@ -125,15 +125,17 @@ class _WavesState extends State<Waves> with SingleTickerProviderStateMixin {
     });
   }
 
+  /// Cleanup listeners and controllers
+  /// to avoid updating widget's state
+  /// when it's not visible (mounted) anymore.
   @override
   void dispose() {
-    animation.removeListener(_updateState);
+    animation.removeListener(_triggerRerender);
     controller.dispose();
     super.dispose();
   }
 
-  /// Trigger a rerender.
-  void _updateState() => setState(() {});
+  void _triggerRerender() => setState(() {});
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +151,13 @@ class _WavesState extends State<Waves> with SingleTickerProviderStateMixin {
     /// the clipper to get a clip.
     /// Only then, it does the clipping.
     return ClipPath(
+      /// Clipper instance will be fed with size
+      /// of the clipped child to provide
+      /// a path for this specific size.
       clipper: clipper,
+
+      /// Use the given widget for snipping
+      /// or fallback to a coloured container.
       child: widget.child ??
           Container(
             height: 200,
@@ -173,10 +181,26 @@ class WavesClipper extends CustomClipper<Path> {
     this.maxExtent = .5,
   });
 
+  /// Determine what should be drawn
+  /// given a rectangle with a given [size].
+  ///
+  /// The path must be closed!
+  /// If we don't close it, the ClipPath will
+  /// and it probably would not result with
+  /// the desired effect.
   @override
   Path getClip(Size size) {
+    /// Creating a path is like passing a pencil
+    /// between painters. Wherever the last movement
+    /// ended is the beginning for the next painter.
     final path = Path();
+
+    /// Move the path to the start position.
     path.moveTo(0, size.height * .3);
+
+    /// For each peak, call a wave method.
+    /// The width will be split evenly
+    /// for each wave.
     List.generate(peaks, (index) => index).forEach(
       (index) {
         wave(
@@ -188,7 +212,10 @@ class WavesClipper extends CustomClipper<Path> {
       },
     );
 
+    /// Make sure the path is closed with
+    /// the bottom part included.
     finish(path, size);
+
     return path;
   }
 
@@ -227,6 +254,10 @@ class WavesClipper extends CustomClipper<Path> {
     path.lineTo(0, size.height);
   }
 
+  /// Notify the instance user whether is should clip
+  /// the child again or not. Every size change
+  /// will trigger the getClip method anyway
+  /// so here we're dealing just with our custom fields.
   @override
   bool shouldReclip(WavesClipper oldClipper) =>
       oldClipper.progress != progress ||
