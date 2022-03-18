@@ -51,8 +51,7 @@ class WavesPage extends StatelessWidget {
       );
 }
 
-/// Animated waves snipping widget
-/// just for convenience.
+/// Animated waves snipping widget.
 class Waves extends StatefulWidget {
   final Color color;
   final Curve curve;
@@ -97,6 +96,16 @@ class _WavesState extends State<Waves> with SingleTickerProviderStateMixin {
     /// 0.0 to 1.0.
     /// Current animation state is determined
     /// by given duration and a curve.
+    ///
+    /// It's like following a plot of a function:
+    ///
+    ///  y (current value)
+    ///  ^
+    /// 1|                 o
+    ///  |       o
+    ///  |   o
+    ///  | o
+    /// 0|---------------------> x (time)
     animation = CurvedAnimation(
       parent: tween.animate(controller),
       curve: widget.curve,
@@ -143,6 +152,15 @@ class _WavesState extends State<Waves> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     /// Clipper just defines the path to clip.
+    ///
+    /// This is why our shouldReclip method
+    /// doesn't make much sense: we're
+    /// creating a new instance of a clipper
+    /// each time the widget is built.
+    /// It's ok though, if the clipper instance
+    /// would be used another way and will be
+    /// longer lived, it could get rid of some
+    /// unnecessary renders.
     final clipper = WavesClipper(
       progress: animation.value,
       peaks: widget.peaks,
@@ -152,7 +170,8 @@ class _WavesState extends State<Waves> with SingleTickerProviderStateMixin {
     /// The ClipPath measures the child
     /// and forwards the size to
     /// the clipper to get a clip.
-    /// Only then, it does the clipping.
+    /// Only then, it does the clipping according
+    /// to the received path.
     return ClipPath(
       /// Clipper instance will be fed with size
       /// of the clipped child to provide
@@ -185,17 +204,17 @@ class WavesClipper extends CustomClipper<Path> {
   });
 
   /// Determine what should be drawn
-  /// given a rectangle with a given [size].
+  /// given a rectangle of a given [size].
   ///
   /// The path must be closed!
-  /// If we don't close it, the ClipPath will
-  /// and it probably would not result with
+  /// If we don't close it, it'll be closed automatically
+  /// and it probably wouldn't result with
   /// the desired effect.
   @override
   Path getClip(Size size) {
     /// Creating a path is like passing a pencil
     /// between painters. Wherever the last movement
-    /// ended is the beginning for the next painter.
+    /// ended, it's the beginning for the next painter.
     final path = Path();
 
     /// Move the path to the start position.

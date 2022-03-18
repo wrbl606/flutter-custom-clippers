@@ -28,8 +28,6 @@ class StripesClipper extends CustomClipper<Path> {
       },
     );
     path.moveTo(0, size.height);
-
-    finish(path, size);
     return path;
   }
 
@@ -43,11 +41,6 @@ class StripesClipper extends CustomClipper<Path> {
     path.moveTo(startPoint.x, startPoint.y);
     [secondPoint, thirdPoint, endPoint, startPoint]
         .forEach((point) => path.lineTo(point.x, point.y));
-  }
-
-  void finish(Path path, Size size) {
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
   }
 
   @override
