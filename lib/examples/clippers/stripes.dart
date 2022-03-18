@@ -32,7 +32,7 @@ class StripesClipper extends CustomClipper<Path> {
 
   void stripe(Path path, Size size, Offset offset) {
     final thickness = size.height / skewFactor;
-    final startPoint = Point(0 + offset.dx, 0 + offset.dy);
+    final startPoint = Point(offset.dx, offset.dy);
     final secondPoint = Point(size.width, startPoint.y + thickness);
     final thirdPoint = Point(size.width, secondPoint.y + thickness);
     final endPoint = Point(startPoint.x, startPoint.y + thickness);
