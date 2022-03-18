@@ -81,6 +81,9 @@ class _WavesState extends State<Waves> with SingleTickerProviderStateMixin {
   late final controller = AnimationController(
     vsync: this,
     duration: widget.duration,
+
+    /// Make the animation start in the middle.
+    value: .5,
   );
   late final tween = Tween<double>(begin: 0, end: 1);
   late Animation<double> animation;

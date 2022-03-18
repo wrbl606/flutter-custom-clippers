@@ -70,9 +70,15 @@ class _MyAppState extends State<MyApp> {
                     color: Colors.blue,
                   ),
                 ),
-                const WavesPage(
-                  layers: 1,
-                  duration: Duration(days: 365),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: ClipPath(
+                    clipper: const WavesClipper(progress: .5),
+                    child: Container(
+                      height: 200,
+                      color: Colors.blue,
+                    ),
+                  ),
                 ),
                 const WavesPage(layers: 1),
                 const WavesPage(),
