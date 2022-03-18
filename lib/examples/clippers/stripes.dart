@@ -27,7 +27,6 @@ class StripesClipper extends CustomClipper<Path> {
         );
       },
     );
-    path.moveTo(0, size.height);
     return path;
   }
 
