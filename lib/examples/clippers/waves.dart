@@ -106,6 +106,8 @@ class _WavesState extends State<Waves> with SingleTickerProviderStateMixin {
     ///  |   o
     ///  | o
     /// 0|---------------------> x (time)
+    ///    ^ ^   ^        ^
+    ///  .25 .5  .75      1
     animation = CurvedAnimation(
       parent: tween.animate(controller),
       curve: widget.curve,

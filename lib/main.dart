@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:throttling/throttling.dart';
 
 import 'examples/battery/battery.dart';
+import 'examples/clippers/strings.dart';
 import 'examples/video.dart';
 
 void main() {
@@ -260,7 +261,8 @@ class _MyAppState extends State<MyApp> {
                     ],
                   ),
                 ),
-              ],
+                Strings(),
+              ].reversed.toList(),
             ),
           ),
         ),
