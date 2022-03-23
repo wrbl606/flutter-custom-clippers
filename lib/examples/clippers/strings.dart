@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:throttling/throttling.dart';
 
 class StringsClipper extends CustomClipper<Path> {
   final double progress;
@@ -121,6 +122,8 @@ class Strings extends StatefulWidget {
 }
 
 class _StringsState extends State<Strings> with SingleTickerProviderStateMixin {
+  final thr = Throttling(duration: const Duration(milliseconds: 100));
+
   late final controller = AnimationController(
     vsync: this,
     duration: widget.duration,
@@ -135,24 +138,7 @@ class _StringsState extends State<Strings> with SingleTickerProviderStateMixin {
     animation = CurvedAnimation(
       parent: tween.animate(controller),
       curve: widget.curve,
-    )
-      ..addListener(_updateState)
-      ..addStatusListener((status) {
-        switch (status) {
-          case AnimationStatus.completed:
-            controller.reverse();
-            break;
-          case AnimationStatus.dismissed:
-            controller.forward();
-            break;
-          default:
-            break;
-        }
-      });
-
-    Future.delayed(widget.delay).then((_) {
-      controller.forward();
-    });
+    )..addListener(_updateState);
   }
 
   void _updateState() => setState(() {});
@@ -161,19 +147,34 @@ class _StringsState extends State<Strings> with SingleTickerProviderStateMixin {
   void dispose() {
     animation.removeListener(_updateState);
     controller.dispose();
+    thr.close();
     super.dispose();
   }
 
+  void _handlePointerMove(PointerMoveEvent event) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final gestureYPos = event.position.dy;
+    final percentage = (screenHeight - gestureYPos) / screenHeight;
+    debugPrint('$percentage');
+    thr.throttle(() {
+      controller.animateTo(1 - percentage,
+          duration: const Duration(milliseconds: 500));
+    });
+  }
+
   @override
-  Widget build(BuildContext context) => ClipPath(
-        clipper: StringsClipper(
-          progress: animation.value,
-          stripes: widget.stripes,
+  Widget build(BuildContext context) => Listener(
+        onPointerMove: _handlePointerMove,
+        child: ClipPath(
+          clipper: StringsClipper(
+            progress: animation.value,
+            stripes: widget.stripes,
+          ),
+          child: widget.child ??
+              Container(
+                height: 200,
+                color: widget.color,
+              ),
         ),
-        child: widget.child ??
-            Container(
-              height: 200,
-              color: widget.color,
-            ),
       );
 }
